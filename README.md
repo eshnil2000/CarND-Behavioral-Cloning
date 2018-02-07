@@ -187,7 +187,7 @@ I also trained the vehicle to take sharp recovery angles when it landed on sandy
 Finally, I trained the vehicle to start on the white boundaries and then recover inwards towards the tracks.
 
 An example of training the vehicle to take sharp steering angles away from boundaries is show here [return.jpg](./return.jpg)
-
+![Return][https://github.com/eshnil2000/CarND-Behavioral-Cloning/blob/master/return.jpg]
 In addition to these training strategies, I also augmented the data by flipping the images so it could learn behavior for both steering directions.
 
 An example of the captured image and flipped image can be found here [flip.jpg](./flip.jpg) and [flipped.jpg](./flipped.jpg)
