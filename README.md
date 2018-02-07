@@ -186,11 +186,15 @@ TO fix the wandering problem in the 3 mentioned areas, I trained the vehicle by 
 I also trained the vehicle to take sharp recovery angles when it landed on sandy/ brown patches.
 Finally, I trained the vehicle to start on the white boundaries and then recover inwards towards the tracks.
 
-An example of training the vehicle to take sharp steering angles away from boundaries is show here [return.jpg](./return.jpg)
+An example of training the vehicle to take sharp steering angles away from boundaries is show here [
+
 ![Return](https://raw.githubusercontent.com/eshnil2000/CarND-Behavioral-Cloning/master/return.jpg)
+
 In addition to these training strategies, I also augmented the data by flipping the images so it could learn behavior for both steering directions.
 
-An example of the captured image and flipped image can be found here ![Original](https://raw.githubusercontent.com/eshnil2000/CarND-Behavioral-Cloning/master/flip.jpg) and [![Flipped](https://raw.githubusercontent.com/eshnil2000/CarND-Behavioral-Cloning/master/flipped.jpg)
+An example of the captured image and flipped image can be found here 
+![Original](https://raw.githubusercontent.com/eshnil2000/CarND-Behavioral-Cloning/master/flip.jpg) 
+[![Flipped](https://raw.githubusercontent.com/eshnil2000/CarND-Behavioral-Cloning/master/flipped.jpg)
 
 In crossing the bridge, it helped to train the vehicle to stay away from the black edges by weaving an "S" curve across the bridge to train it to take medium steering angles to recover away from black edges.
 
@@ -217,5 +221,8 @@ I started with a generic dense network, which didnt work too well. I looked at t
 
 The vehicle made it just fine through multiple rounds of track 1 with this model, with the training strategy mentioned above.
 
-A video of the vehicle driving along the track can be found here in the file run1.mp4. The video is grainy, to save space I used 45 Frames per second. [run1.mp4](./run1.mp4)
+A video of the vehicle driving along the track can be found here in the file run1.mp4. The video is grainy, to save space I used 45 Frames per second.
+
+![Video](https://raw.githubusercontent.com/eshnil2000/CarND-Behavioral-Cloning/master/run1.jpg)
+
 
