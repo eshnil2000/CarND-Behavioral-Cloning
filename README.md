@@ -223,6 +223,6 @@ The vehicle made it just fine through multiple rounds of track 1 with this model
 
 A video of the vehicle driving along the track can be found here in the file run1.mp4. The video is grainy, to save space I used 45 Frames per second.
 
-![Video](https://raw.githubusercontent.com/eshnil2000/CarND-Behavioral-Cloning/master/run1.jpg)
+![Video](https://raw.githubusercontent.com/eshnil2000/CarND-Behavioral-Cloning/master/run1.mp4)
 
 
