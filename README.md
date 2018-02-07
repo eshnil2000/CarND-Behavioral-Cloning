@@ -14,11 +14,7 @@ There are five key files:
 * model.ipynb (script used to create and train the model)
 * drive.py (script to drive the car )
 * model.h5 (a trained Keras model)
-* a report writeup file 
 * video.mp4 (a video recording of the vehicle driving autonomously around the track for at least one full lap)
-
-This README file describes how to output the video in the "Details About Files In This Directory" section.
-
 
 The Project
 ---
@@ -127,7 +123,7 @@ Python drive.py model.h5
 
 #### 3. Submission code is usable and readable
 
-The model.ipynb file contains the code for training and saving the convolution neural network. The file shows the pipeline I used for training and validating the model, and it contains comments to explain how the code works.
+The model.ipynb [model.ipynb](./model.ipynb) file contains the code for training and saving the convolution neural network. The file shows the pipeline I used for training and validating the model, and it contains comments to explain how the code works.
 
 ### Model Architecture and Training Strategy
 
@@ -200,7 +196,7 @@ TO fix the wandering problem in the 3 mentioned areas, I trained the vehicle by 
 I also trained the vehicle to take sharp recovery angles when it landed on sandy/ brown patches.
 Finally, I trained the vehicle to start on the white boundaries and then recover inwards towards the tracks.
 
-An example of training the vehicle to take sharp steering angles away from boundaries is show here.
+An example of training the vehicle to take sharp steering angles away from boundaries is show here [return.jpg](./return.jpg)
 
 In addition to these training strategies, I also augmented the data by flipping the images so it could learn behavior for both steering directions.
 
@@ -216,5 +212,5 @@ I started with a generic dense network, which didnt work too well. I looked at t
 
 The vehicle made it just fine through multiple rounds of track 1 with this model, with the training strategy mentioned above.
 
-A video of the vehicle driving along the track can be found here in the file run1.mp4. The video is grainy, to save space I used 45 Frames per second. 
+A video of the vehicle driving along the track can be found here in the file run1.mp4. The video is grainy, to save space I used 45 Frames per second. [run1.mp4](./run1.mp4)
 
