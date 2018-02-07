@@ -16,6 +16,7 @@ There are five key files:
 * [drive.py](./drive.py)drive.py (script to drive the car )
 * [model.h5](./model.h5)(a trained Keras model)
 * [run1.mp4](./run1.mp4) (a video recording of the vehicle driving autonomously around the track for at least one full lap)
+* [README](./README.md) (this readme file has the write up for the project!)
 
 The Project
 ---
