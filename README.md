@@ -193,7 +193,10 @@ An example of training the vehicle to take sharp steering angles away from bound
 In addition to these training strategies, I also augmented the data by flipping the images so it could learn behavior for both steering directions.
 
 An example of the captured image and flipped image can be found here 
-![Original](https://raw.githubusercontent.com/eshnil2000/CarND-Behavioral-Cloning/master/flip.jpg) 
+### Original
+![Original](https://raw.githubusercontent.com/eshnil2000/CarND-Behavioral-Cloning/master/flip.jpg)
+
+### Flipped
 [![Flipped](https://raw.githubusercontent.com/eshnil2000/CarND-Behavioral-Cloning/master/flipped.jpg)
 
 In crossing the bridge, it helped to train the vehicle to stay away from the black edges by weaving an "S" curve across the bridge to train it to take medium steering angles to recover away from black edges.
