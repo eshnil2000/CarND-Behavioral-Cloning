@@ -124,6 +124,7 @@ My initial approach was to use a fully connected neural network, but I quickly s
 
 A model summary is as follows:
 
+```
 ### INITIALIZE Keras sequential model
 model = Sequential()
 
@@ -160,6 +161,7 @@ model.add(Dense(1))
 
 ### COMPILE USING ADAM OPTIMIZER, SO THAT LEARNING RATE DOESNT HAVE TO BE SET MANUALLY
 model.compile(optimizer="adam", loss="mse")
+```
 
 #### 2. Attempts to reduce overfitting in the model
 
@@ -195,17 +197,18 @@ In crossing the bridge, it helped to train the vehicle to stay away from the bla
 A key part of the training strategy involved using the generator function in keras/ python. Once significant amount of images had been collected, my laptop was running out of memory to load all the images in memory [8GB Mac PRO]. Instead of switching to a more powerful machine on AWS or switching to a GPU instance, I used generators to load images as and when needed and available. This allowed me to complete the training process smoothly.
 
 ### Keras code: 
+```
 #setup generators, feed data in batches of 32 images to conserve memory
 train_generator = generator(train_samples, batch_size=32)
 validation_generator = generator(validation_samples, batch_size=32)
-
+```
 ### Generator code:
-
+```
 ###SETUP GENERATOR FUNCTION TO STREAM DATA INSTEAD OF PRE-LOADING INTO MEMORY
 def generator(samples, batch_size=128):
   ....
   yield sklearn.utils.shuffle(inputs, outputs)
-
+```
 ### Model Architecture 
 
 #### 1. Solution Design Approach
