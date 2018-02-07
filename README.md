@@ -14,7 +14,7 @@ There are five key files:
 * [model.ipynb](./model.ipynb) (script used to create and train the model)
 * [drive.py](./drive.py)drive.py (script to drive the car )
 * [model.h5](./model.h5)(a trained Keras model)
-* [run1.mp4](./run1.mp4)video.mp4 (a video recording of the vehicle driving autonomously around the track for at least one full lap)
+* [run1.mp4](./run1.mp4) (a video recording of the vehicle driving autonomously around the track for at least one full lap)
 
 The Project
 ---
