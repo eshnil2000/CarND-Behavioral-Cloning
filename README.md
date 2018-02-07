@@ -124,16 +124,16 @@ My initial approach was to use a fully connected neural network, but I quickly s
 
 A model summary is as follows:
 
-###INITIALIZE Keras sequential model
+### INITIALIZE Keras sequential model
 model = Sequential()
 
-###Pre-process the data, center the data
+### Pre-process the data, center the data
 model.add(Lambda(lambda x:x/127.5-1,input_shape=(160,320,3) ))
 
-###Crop the images to remove extraneous information, focus on the immediate road ahead
+### Crop the images to remove extraneous information, focus on the immediate road ahead
 model.add(Cropping2D(cropping=((70,25), (0,0)), input_shape=(160,320,3)))
 
-###USE THE MODEL DEFINED IN COMMA.AI Steering model
+### USE THE MODEL DEFINED IN COMMA.AI Steering model
 #https://github.com/commaai/research/blob/master/train_steering_model.py
 ##3 convolution layers interleaved with 3 Exponential Linear Units
 model.add(Convolution2D(16, 8, 8, subsample=(4, 4), border_mode="same"))
@@ -145,24 +145,21 @@ model.add(Convolution2D(64, 5, 5, subsample=(2, 2), border_mode="same"))
 ### FLatten the model, convert 3 dimensional output on Convolution layer to 1 dimension
 model.add(Flatten())
 
-###Add a dropout layer to prevent overfitting
+### Add a dropout layer to prevent overfitting
 model.add(Dropout(.2))
 model.add(ELU())
 
-###Add a Dense layer with 512 outputs
+### Add a Dense layer with 512 outputs
 model.add(Dense(512))
 model.add(Dropout(.5))
 model.add(ELU())
 
-###FInally reduce the output to 1 representing steering angle
+### FInally reduce the output to 1 representing steering angle
 model.add(Dense(1))
 ###END COMMA.AI MODEL
 
-###COMPILE USING ADAM OPTIMIZER, SO THAT LEARNING RATE DOESNT HAVE TO BE SET MANUALLY
+### COMPILE USING ADAM OPTIMIZER, SO THAT LEARNING RATE DOESNT HAVE TO BE SET MANUALLY
 model.compile(optimizer="adam", loss="mse")
-
-
-(More details about this bellow.)
 
 #### 2. Attempts to reduce overfitting in the model
 
