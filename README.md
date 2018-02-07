@@ -6,28 +6,19 @@ Overview
 ---
 This repository contains starting files for the Behavioral Cloning Project.
 
-In this project, you will use what you've learned about deep neural networks and convolutional neural networks to clone driving behavior. You will train, validate and test a model using Keras. The model will output a steering angle to an autonomous vehicle.
+In this project, I use deep neural networks and convolutional neural networks to clone driving behavior,   train, validate and test a model using Keras. The model  output's a steering angle to an autonomous vehicle.
 
-We have provided a simulator where you can steer a car around a track for data collection. You'll use image data and steering angles to train a neural network and then use this model to drive the car autonomously around the track.
+This project uses a simulator provided by Udacity https://github.com/udacity/self-driving-car-sim where you can steer a car around a track for data collection. I used image data and steering angles to train a neural network and then use this model to drive the car autonomously around the track.
 
-We also want you to create a detailed writeup of the project. Check out the [writeup template](https://github.com/udacity/CarND-Behavioral-Cloning-P3/blob/master/writeup_template.md) for this project and use it as a starting point for creating your own writeup. The writeup can be either a markdown file or a pdf document.
-
-To meet specifications, the project will require submitting five files: 
-* model.py (script used to create and train the model)
-* drive.py (script to drive the car - feel free to modify this file)
+There are five key files: 
+* model.ipynb (script used to create and train the model)
+* drive.py (script to drive the car )
 * model.h5 (a trained Keras model)
-* a report writeup file (either markdown or pdf)
-* video.mp4 (a video recording of your vehicle driving autonomously around the track for at least one full lap)
+* a report writeup file 
+* video.mp4 (a video recording of the vehicle driving autonomously around the track for at least one full lap)
 
 This README file describes how to output the video in the "Details About Files In This Directory" section.
 
-Creating a Great Writeup
----
-A great writeup should include the [rubric points](https://review.udacity.com/#!/rubrics/432/view) as well as your description of how you addressed each point.  You should include a detailed description of the code used (with line-number references and code snippets where necessary), and links to other supporting documents or external references.  You should include images in your writeup to demonstrate how your code works with examples.  
-
-All that said, please be concise!  We're not looking for you to write a book here, just a brief description of how you passed each rubric point, and references to the relevant code :). 
-
-You're not required to use markdown for your writeup.  If you use another method please just submit a pdf of your writeup.
 
 The Project
 ---
@@ -49,7 +40,6 @@ The following resources can be found in this github repository:
 * video.py
 * writeup_template.md
 
-The simulator can be downloaded from the classroom. In the classroom, we have also provided sample data that you can optionally use to help train your model.
 
 ## Details About Files In This Directory
 
@@ -112,14 +102,119 @@ python video.py run1 --fps 48
 
 Will run the video at 48 FPS. The default FPS is 60.
 
-#### Why create a video
+## Rubric Points
+Here I will consider the [rubric points](https://review.udacity.com/#!/rubrics/432/view) individually and describe how I addressed each point in my implementation.
 
-1. It's been noted the simulator might perform differently based on the hardware. So if your model drives succesfully on your machine it might not on another machine (your reviewer). Saving a video is a solid backup in case this happens.
-2. You could slightly alter the code in `drive.py` and/or `video.py` to create a video of what your model sees after the image is processed (may be helpful for debugging).
+### Files Submitted & Code Quality
 
-### Tips
-- Please keep in mind that training images are loaded in BGR colorspace using cv2 while drive.py load images in RGB to predict the steering angles.
+#### 1. Submission includes all required files and can be used to run the simulator in autonomous mode
+My project includes the following files:
 
-## How to write a README
-A well written README file can enhance your project and portfolio.  Develop your abilities to create professional README files by completing [this free course](https://www.udacity.com/course/writing-readmes--ud777).
+- **model.py** : Containing the script to create and train the model
+- **drive.py** : For driving the car in autonomous mode in the simulator (This is provided [Udacity](https://github.com/udacity/CarND-Behavioral-Cloning-P3/blob/master/drive.py).
+- **model.h5** : Containing a trained convolution neural network.
+- **writeup_report.md** : Summary of the results
+
+Node:
+
+On my first iteration, I tried using a basic fully connected neural network as a default baseline starting point to get the data feed, pre-processing, training, output/ validation flows working.
+
+#### 2. Submission includes functional code Using the Udacity provided simulator and my drive.py file; the car can be driven autonomously around the track by executing
+
+```
+Python drive.py model.h5
+```
+
+#### 3. Submission code is usable and readable
+
+The model.ipynb file contains the code for training and saving the convolution neural network. The file shows the pipeline I used for training and validating the model, and it contains comments to explain how the code works.
+
+### Model Architecture and Training Strategy
+
+#### 1. An appropriate model architecture has been employed
+
+My initial approach was to use a fully connected neural network, but I quickly switched to a model used by Comma.ai at https://github.com/commaai/research/blob/master/train_steering_model.py, as my car was drifting off of the driving track.
+
+A model summary is as follows:
+
+###INITIALIZE Keras sequential model
+model = Sequential()
+
+###Pre-process the data, center the data
+model.add(Lambda(lambda x:x/127.5-1,input_shape=(160,320,3) ))
+
+###Crop the images to remove extraneous information, focus on the immediate road ahead
+model.add(Cropping2D(cropping=((70,25), (0,0)), input_shape=(160,320,3)))
+
+###USE THE MODEL DEFINED IN COMMA.AI Steering model
+#https://github.com/commaai/research/blob/master/train_steering_model.py
+##3 convolution layers interleaved with 3 Exponential Linear Units
+model.add(Convolution2D(16, 8, 8, subsample=(4, 4), border_mode="same"))
+model.add(ELU())
+model.add(Convolution2D(32, 5, 5, subsample=(2, 2), border_mode="same"))
+model.add(ELU())
+model.add(Convolution2D(64, 5, 5, subsample=(2, 2), border_mode="same"))
+
+### FLatten the model, convert 3 dimensional output on Convolution layer to 1 dimension
+model.add(Flatten())
+
+###Add a dropout layer to prevent overfitting
+model.add(Dropout(.2))
+model.add(ELU())
+
+###Add a Dense layer with 512 outputs
+model.add(Dense(512))
+model.add(Dropout(.5))
+model.add(ELU())
+
+###FInally reduce the output to 1 representing steering angle
+model.add(Dense(1))
+###END COMMA.AI MODEL
+
+###COMPILE USING ADAM OPTIMIZER, SO THAT LEARNING RATE DOESNT HAVE TO BE SET MANUALLY
+model.compile(optimizer="adam", loss="mse")
+
+
+(More details about this bellow.)
+
+#### 2. Attempts to reduce overfitting in the model
+
+I split my sample data into training and validation data. Using 80% as training and 20% as validation.
+train_samples, validation_samples = train_test_split(samples, test_size=0.2)
+
+#### 3. Model parameter tuning
+
+The model used an Adam optimizer, so the learning rate was not tuned manually.
+
+#### 4. Appropriate training data & training strategy
+
+I trained the vehicle by running it for 2 laps on the First course, and 1 lap over the 2nd course. This was not sufficient to keep the car within the boundaries of the course. The vehicle kept wandering off at 3 distinct points: 
+1. When it found a white/ grey edge on the road.
+2. When it found a black edge on the road, on the bridge.
+3. When it approached brown/ sandy areas which were not clearly marked.
+4. When it happened to line up on a white edge.
+
+The basic training on the laps was good enough to keep the vehicle within the track initially and then when it detected the red and white markings at sharp curves.
+
+TO fix the wandering problem in the 3 mentioned areas, I trained the vehicle by recording recovery manouvers by showing it to take sharp steering angles away from the white, grey and black edges. 
+I also trained the vehicle to take sharp recovery angles when it landed on sandy/ brown patches.
+Finally, I trained the vehicle to start on the white boundaries and then recover inwards towards the tracks.
+
+An example of training the vehicle to take sharp steering angles away from boundaries is show here.
+
+In addition to these training strategies, I also augmented the data by flipping the images so it could learn behavior for both steering directions.
+
+An example of the captured image and flipped image can be found here.
+
+In crossing the bridge, it helped to train the vehicle to stay away from the black edges by weaving an "S" curve across the bridge to train it to take medium steering angles to recover away from black edges.
+
+### Model Architecture 
+
+#### 1. Solution Design Approach
+
+I started with a generic dense network, which didnt work too well. I looked at the advanced Nvidia Architecture, but wanted to see if there was an easier fix, since I did not have access to the GPU. The Comma.AI steering model seemed like a good compromise between too simple and too complex of a network. 
+
+The vehicle made it just fine through multiple rounds of track 1 with this model, with the training strategy mentioned above.
+
+A video of the vehicle driving along the track can be found here in the file run1.mp4. The video is grainy, to save space I used 45 Frames per second. 
 
