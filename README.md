@@ -10,6 +10,7 @@ In this project, I use deep neural networks and convolutional neural networks to
 
 This project uses a simulator provided by Udacity https://github.com/udacity/self-driving-car-sim where you can steer a car around a track for data collection. I used image data and steering angles to train a neural network and then use this model to drive the car autonomously around the track.
 
+# Files & Code Quality
 There are five key files: 
 * [model.ipynb](./model.ipynb) (script used to create and train the model)
 * [drive.py](./drive.py)drive.py (script to drive the car )
@@ -100,16 +101,6 @@ Will run the video at 48 FPS. The default FPS is 60.
 
 ## Rubric Points
 Here I will consider the [rubric points](https://review.udacity.com/#!/rubrics/432/view) individually and describe how I addressed each point in my implementation.
-
-### Files Submitted & Code Quality
-
-#### 1. Submission includes all required files and can be used to run the simulator in autonomous mode
-My project includes the following files:
-
-- **model.py** : Containing the script to create and train the model
-- **drive.py** : For driving the car in autonomous mode in the simulator (This is provided [Udacity](https://github.com/udacity/CarND-Behavioral-Cloning-P3/blob/master/drive.py).
-- **model.h5** : Containing a trained convolution neural network.
-- **writeup_report.md** : Summary of the results
 
 Node:
 
