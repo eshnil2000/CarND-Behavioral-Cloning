@@ -10,15 +10,13 @@ In this project, I use deep neural networks and convolutional neural networks to
 
 This project uses a simulator provided by Udacity https://github.com/udacity/self-driving-car-sim where you can steer a car around a track for data collection. I used image data and steering angles to train a neural network and then use this model to drive the car autonomously around the track.
 
+# Files & Code Quality
 There are five key files: 
-* model.ipynb (script used to create and train the model)
-* drive.py (script to drive the car )
-* model.h5 (a trained Keras model)
-* a report writeup file 
-* video.mp4 (a video recording of the vehicle driving autonomously around the track for at least one full lap)
-
-This README file describes how to output the video in the "Details About Files In This Directory" section.
-
+* [model.ipynb](./model.ipynb) (script used to create and train the model)
+* [drive.py](./drive.py)drive.py (script to drive the car )
+* [model.h5](./model.h5)(a trained Keras model)
+* [run1.mp4](./run1.mp4) (a video recording of the vehicle driving autonomously around the track for at least one full lap)
+* [README](./README.md) (this readme file has the write up for the project!)
 
 The Project
 ---
@@ -105,16 +103,6 @@ Will run the video at 48 FPS. The default FPS is 60.
 ## Rubric Points
 Here I will consider the [rubric points](https://review.udacity.com/#!/rubrics/432/view) individually and describe how I addressed each point in my implementation.
 
-### Files Submitted & Code Quality
-
-#### 1. Submission includes all required files and can be used to run the simulator in autonomous mode
-My project includes the following files:
-
-- **model.py** : Containing the script to create and train the model
-- **drive.py** : For driving the car in autonomous mode in the simulator (This is provided [Udacity](https://github.com/udacity/CarND-Behavioral-Cloning-P3/blob/master/drive.py).
-- **model.h5** : Containing a trained convolution neural network.
-- **writeup_report.md** : Summary of the results
-
 Node:
 
 On my first iteration, I tried using a basic fully connected neural network as a default baseline starting point to get the data feed, pre-processing, training, output/ validation flows working.
@@ -127,7 +115,7 @@ Python drive.py model.h5
 
 #### 3. Submission code is usable and readable
 
-The model.ipynb file contains the code for training and saving the convolution neural network. The file shows the pipeline I used for training and validating the model, and it contains comments to explain how the code works.
+The model.ipynb [model.ipynb](./model.ipynb) file contains the code for training and saving the convolution neural network. The file shows the pipeline I used for training and validating the model, and it contains comments to explain how the code works.
 
 ### Model Architecture and Training Strategy
 
@@ -137,16 +125,17 @@ My initial approach was to use a fully connected neural network, but I quickly s
 
 A model summary is as follows:
 
-###INITIALIZE Keras sequential model
+```
+### INITIALIZE Keras sequential model
 model = Sequential()
 
-###Pre-process the data, center the data
+### Pre-process the data, center the data
 model.add(Lambda(lambda x:x/127.5-1,input_shape=(160,320,3) ))
 
-###Crop the images to remove extraneous information, focus on the immediate road ahead
+### Crop the images to remove extraneous information, focus on the immediate road ahead
 model.add(Cropping2D(cropping=((70,25), (0,0)), input_shape=(160,320,3)))
 
-###USE THE MODEL DEFINED IN COMMA.AI Steering model
+### USE THE MODEL DEFINED IN COMMA.AI Steering model
 #https://github.com/commaai/research/blob/master/train_steering_model.py
 ##3 convolution layers interleaved with 3 Exponential Linear Units
 model.add(Convolution2D(16, 8, 8, subsample=(4, 4), border_mode="same"))
@@ -158,24 +147,22 @@ model.add(Convolution2D(64, 5, 5, subsample=(2, 2), border_mode="same"))
 ### FLatten the model, convert 3 dimensional output on Convolution layer to 1 dimension
 model.add(Flatten())
 
-###Add a dropout layer to prevent overfitting
+### Add a dropout layer to prevent overfitting
 model.add(Dropout(.2))
 model.add(ELU())
 
-###Add a Dense layer with 512 outputs
+### Add a Dense layer with 512 outputs
 model.add(Dense(512))
 model.add(Dropout(.5))
 model.add(ELU())
 
-###FInally reduce the output to 1 representing steering angle
+### FInally reduce the output to 1 representing steering angle
 model.add(Dense(1))
 ###END COMMA.AI MODEL
 
-###COMPILE USING ADAM OPTIMIZER, SO THAT LEARNING RATE DOESNT HAVE TO BE SET MANUALLY
+### COMPILE USING ADAM OPTIMIZER, SO THAT LEARNING RATE DOESNT HAVE TO BE SET MANUALLY
 model.compile(optimizer="adam", loss="mse")
-
-
-(More details about this bellow.)
+```
 
 #### 2. Attempts to reduce overfitting in the model
 
@@ -200,14 +187,36 @@ TO fix the wandering problem in the 3 mentioned areas, I trained the vehicle by 
 I also trained the vehicle to take sharp recovery angles when it landed on sandy/ brown patches.
 Finally, I trained the vehicle to start on the white boundaries and then recover inwards towards the tracks.
 
-An example of training the vehicle to take sharp steering angles away from boundaries is show here.
+An example of training the vehicle to take sharp steering angles away from boundaries is show here [
+
+![Return](https://raw.githubusercontent.com/eshnil2000/CarND-Behavioral-Cloning/master/return.jpg)
 
 In addition to these training strategies, I also augmented the data by flipping the images so it could learn behavior for both steering directions.
 
-An example of the captured image and flipped image can be found here.
+An example of the captured image and flipped image can be found here 
+### Original
+![Original](https://raw.githubusercontent.com/eshnil2000/CarND-Behavioral-Cloning/master/flip.jpg)
+
+### Flipped
+[![Flipped](https://raw.githubusercontent.com/eshnil2000/CarND-Behavioral-Cloning/master/flipped.jpg)
 
 In crossing the bridge, it helped to train the vehicle to stay away from the black edges by weaving an "S" curve across the bridge to train it to take medium steering angles to recover away from black edges.
 
+A key part of the training strategy involved using the generator function in keras/ python. Once significant amount of images had been collected, my laptop was running out of memory to load all the images in memory [8GB Mac PRO]. Instead of switching to a more powerful machine on AWS or switching to a GPU instance, I used generators to load images as and when needed and available. This allowed me to complete the training process smoothly.
+
+### Keras code: 
+```
+#setup generators, feed data in batches of 32 images to conserve memory
+train_generator = generator(train_samples, batch_size=32)
+validation_generator = generator(validation_samples, batch_size=32)
+```
+### Generator code:
+```
+###SETUP GENERATOR FUNCTION TO STREAM DATA INSTEAD OF PRE-LOADING INTO MEMORY
+def generator(samples, batch_size=128):
+  ....
+  yield sklearn.utils.shuffle(inputs, outputs)
+```
 ### Model Architecture 
 
 #### 1. Solution Design Approach
@@ -216,7 +225,10 @@ I started with a generic dense network, which didnt work too well. I looked at t
 
 The vehicle made it just fine through multiple rounds of track 1 with this model, with the training strategy mentioned above.
 
-A video of the vehicle driving along the track can be found here in the file run1.mp4. The video is grainy, to save space I used 45 Frames per second. 
+A video of the vehicle driving along the track can be found here in the file run1.mp4. The video is grainy, to save space I used 45 Frames per second.
+
+![Video](https://raw.githubusercontent.com/eshnil2000/CarND-Behavioral-Cloning/master/run1.mp4)
+
 
 ### 2. Model Description / Details
 Running model.summary() provided the following details of the Neural Network:
