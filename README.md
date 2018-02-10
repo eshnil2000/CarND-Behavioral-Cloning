@@ -123,45 +123,40 @@ The model.ipynb [model.ipynb](./model.ipynb) file contains the code for training
 
 My initial approach was to use a fully connected neural network, but I quickly switched to a model used by Comma.ai at https://github.com/commaai/research/blob/master/train_steering_model.py, as my car was drifting off of the driving track.
 
+The only change that i made to the model was I changed the Exponential Linear Activation to a Leaky ReLU activation. Leaky ReLUs allow a small, non-zero gradient when the unit is not active. If, for whatever reason, the output of a ReLU is consistently 0 (for example, if the ReLU has a large negative bias), then the gradient through it will consistently be 0. The error signal backpropagated from later layers gets multiplied by this 0, so no error signal ever passes to earlier layers. The ReLU has died. This small change seemed to improve the performance of the model (though this was mixed in with Data Augmentation from the Left & Right Cameras)
+
 A model summary is as follows:
 
 ```
 ### INITIALIZE Keras sequential model
 model = Sequential()
-
-### Pre-process the data, center the data
+###Crop the images to remove extraneous information, focus on the immediate road ahead
+model.add(Cropping2D(cropping=((70,25), (0,0)), input_shape=(160,320,3)))###Pre-process the data, center the data
+### Normalize the model
 model.add(Lambda(lambda x:x/127.5-1,input_shape=(160,320,3) ))
-
-### Crop the images to remove extraneous information, focus on the immediate road ahead
-model.add(Cropping2D(cropping=((70,25), (0,0)), input_shape=(160,320,3)))
 
 ### USE THE MODEL DEFINED IN COMMA.AI Steering model
 #https://github.com/commaai/research/blob/master/train_steering_model.py
-##3 convolution layers interleaved with 3 Exponential Linear Units
 model.add(Convolution2D(16, 8, 8, subsample=(4, 4), border_mode="same"))
-model.add(ELU())
+model.add(LeakyReLU(alpha=.001))   # add an advanced activation
+#model.add(ELU())
 model.add(Convolution2D(32, 5, 5, subsample=(2, 2), border_mode="same"))
-model.add(ELU())
+model.add(LeakyReLU(alpha=.001))   # add an advanced activation
+#model.add(ELU())
 model.add(Convolution2D(64, 5, 5, subsample=(2, 2), border_mode="same"))
-
-### FLatten the model, convert 3 dimensional output on Convolution layer to 1 dimension
 model.add(Flatten())
-
-### Add a dropout layer to prevent overfitting
 model.add(Dropout(.2))
-model.add(ELU())
-
-### Add a Dense layer with 512 outputs
+model.add(LeakyReLU(alpha=.001))   # add an advanced activation
+#model.add(ELU())
 model.add(Dense(512))
 model.add(Dropout(.5))
-model.add(ELU())
-
-### FInally reduce the output to 1 representing steering angle
+model.add(LeakyReLU(alpha=.001))   # add an advanced activation
+#model.add(ELU())
 model.add(Dense(1))
-###END COMMA.AI MODEL
-
+### END COMMA.AI MODEL
 ### COMPILE USING ADAM OPTIMIZER, SO THAT LEARNING RATE DOESNT HAVE TO BE SET MANUALLY
 model.compile(optimizer="adam", loss="mse")
+
 ```
 
 #### 2. Attempts to reduce overfitting in the model
@@ -181,7 +176,17 @@ I trained the vehicle by running it for 2 laps on the First course, and 1 lap ov
 3. When it approached brown/ sandy areas which were not clearly marked.
 4. When it happened to line up on a white edge.
 
-The basic training on the laps was good enough to keep the vehicle within the track initially and then when it detected the red and white markings at sharp curves.
+NOTE: I cropped the training images before the normalization steps to save normalization operations on the part of the image that would anyways be cropped.
+```
+###Crop the images to remove extraneous information, focus on the immediate road ahead
+model.add(Cropping2D(cropping=((70,25), (0,0)), input_shape=(160,320,3)))###Pre-process the data, center the data
+```
+
+The basic training on the laps was good enough to keep the vehicle within the track initially and then when it detected the red and white markings at sharp curves. 
+
+Initially, I started by using only the center camera images for training. With this, even though I was able to complete driving across the entire track, my vehicle drifted a few times on the edge of the tracks which is considered unsafe driving. 
+
+When I added in training to include the Left & Right Camera images, with a Steering correction factor of +0.2 for the left images and -0.2 for the right images, the vehicle was able to complete the track without wandering onto the edges. A correction factor was required because the left and right camera images are closer to the edges of the driving track. 
 
 TO fix the wandering problem in the 3 mentioned areas, I trained the vehicle by recording recovery manouvers by showing it to take sharp steering angles away from the white, grey and black edges. 
 I also trained the vehicle to take sharp recovery angles when it landed on sandy/ brown patches.
@@ -225,10 +230,11 @@ I started with a generic dense network, which didnt work too well. I looked at t
 
 The vehicle made it just fine through multiple rounds of track 1 with this model, with the training strategy mentioned above.
 
-A video of the vehicle driving along the track can be found here in the file run1.mp4. The video is grainy, to save space I used 45 Frames per second.
+A video of the vehicle driving along the track can be found here in the file run10.mp4.
 
-![Video](https://raw.githubusercontent.com/eshnil2000/CarND-Behavioral-Cloning/master/run1.mp4)
+![Video](https://raw.githubusercontent.com/eshnil2000/CarND-Behavioral-Cloning/master/run10.mp4)
 
+I initially violated the rules of safe driving by crossing over the lane edges, even though I managed to complete the entire track. Turns out it was a simple matter of adding in the Left & Right camera images into the training process to ensure the vehicle stuck to center of the lane driving.
 
 ### 2. Model Description / Details
 Running model.summary() provided the following details of the Neural Network:
@@ -267,6 +273,24 @@ dense_2 (Dense)                  (None, 1)             513         leakyrelu_4[0
 Total params: 3,345,009
 Trainable params: 3,345,009
 Non-trainable params: 0
+
+### Visualizing the model
+To visualize the model, couple of additional package are required.
+On my mac, I first installed: 
+```
+brew install graphviz
+pip install graphviz
+conda install -c anaconda pydot
+
+```
+
+Then I generated the visualization of the model:
+```
+from keras.utils.visualize_util import plot  
+plot(model, to_file='model.png')
+```
+
+[![Model Visualization](https://raw.githubusercontent.com/eshnil2000/CarND-Behavioral-Cloning/master/model.png)
 
 
 
