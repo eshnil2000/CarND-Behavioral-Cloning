@@ -238,11 +238,9 @@ I initially violated the rules of safe driving by crossing over the lane edges, 
 
 ### 2. Model Description / Details
 Running model.summary() provided the following details of the Neural Network:
-
 ```
 ____________________________________________________________________________________________________
-
-Layer (type)|					Output|				 ShapeParam|	 #Connected to                     
+Layer (type)                     Output Shape          Param #     Connected to                     
 ====================================================================================================
 cropping2d_1 (Cropping2D)        (None, 65, 320, 3)    0           cropping2d_input_1[0][0]         
 ____________________________________________________________________________________________________
